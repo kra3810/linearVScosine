@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เปรียบเทียบ Linear กับ Cosine ด้วยวิธี Paired</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --bg-card: #0b1329;
+            --accent-neon: #00f0ff;
+            --accent-purple: #7000ff;
+            --accent-pink: #ff007a;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border-glow: rgba(0, 240, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(112, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(0, 240, 255, 0.15) 0%, transparent 50%),
+                linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            max-height: none;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Top Glow Line */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 20;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-neon), var(--accent-purple), var(--accent-pink));
+            width: 10%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px var(--accent-neon);
+        }
+
+        /* Header */
+        .slide-header {
+            padding: 20px 40px 14px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(3, 7, 18, 0.7);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .slide-tag {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--accent-neon);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 1px solid var(--accent-neon);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        /* Viewport */
+        .slides-viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slides-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100%;
+            padding: 40px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .slide-inner-content {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        /* Typography */
+        .slide h1 {
+            font-size: 3.8rem;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent-neon) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+            line-height: 1.2;
+        }
+
+        .slide h2 {
+            font-size: 2.2rem;
+            color: var(--accent-neon);
+            margin-bottom: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid rgba(0, 240, 255, 0.2);
+            padding-bottom: 12px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        .slide p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-weight: 300;
+        }
+
+        .highlight {
+            color: var(--text-main);
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Cards / Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, rgba(11, 19, 41, 0.9), rgba(3, 7, 18, 0.8));
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 18px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--accent-neon), var(--accent-purple));
+        }
+
+        .card.pink-border {
+            border: 1px solid rgba(255, 0, 122, 0.2);
+        }
+
+        .card.pink-border::before {
+            background: linear-gradient(to bottom, var(--accent-pink), var(--accent-purple));
+        }
+
+        .card.pink-border h3 {
+            color: var(--accent-pink);
+        }
+
+        .card h3 {
+            color: var(--accent-neon);
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        /* Lists */
+        ul.custom-list {
+            list-style: none;
+        }
+
+        ul.custom-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        ul.custom-list li::before {
+            content: "⚡";
+            position: absolute;
+            left: 0;
+            font-size: 1rem;
+            color: var(--accent-neon);
+        }
+
+        /* Table */
+        .styled-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 15px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            background: rgba(3, 7, 18, 0.8);
+        }
+
+        .styled-table th, .styled-table td {
+            padding: 18px 24px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.1rem;
+        }
+
+        .styled-table th {
+            background: rgba(0, 240, 255, 0.15);
+            color: var(--accent-neon);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .styled-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Code Box */
+        .code-box {
+            background: #02040a;
+            border: 1px solid rgba(112, 0, 255, 0.4);
+            border-radius: 14px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.05rem;
+            color: var(--accent-neon);
+            overflow-x: auto;
+            line-height: 1.7;
+            box-shadow: inset 0 0 20px rgba(112, 0, 255, 0.2);
+            white-space: pre-wrap;
+        }
+
+        /* Math formula */
+        math {
+            font-family: 'Prompt', sans-serif;
+            font-size: 1.8rem;
+            color: var(--text-main);
+        }
+        
+        .formula-container {
+            background: rgba(3,7,18,0.5); 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        .slide-footer {
+            padding: 20px 40px;
+            background: rgba(3, 7, 18, 0.9);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(112, 0, 255, 0.2));
+            color: var(--accent-neon);
+            border: 1px solid var(--accent-neon);
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+        }
+
+        .btn:hover:not(:disabled) {
+            background: var(--accent-neon);
+            color: var(--bg-deep);
+            box-shadow: 0 0 25px var(--accent-neon);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            box-shadow: none;
+        }
+
+        .dots-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            max-width: 55%;
+            overflow-x: auto;
+            padding: 4px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .dot.active {
+            width: 35px;
+            border-radius: 6px;
+            background: var(--accent-neon);
+            box-shadow: 0 0 15px var(--accent-neon);
+        }
+
+        /* Scrollbar */
+        .slide::-webkit-scrollbar {
+            width: 6px;
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.3);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation-container">
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="slide-header">
+        <span class="header-title">R Studio AI Training — Paired Analysis</span>
+        <span class="slide-tag" id="slideTag">Slide 1 / 13</span>
+    </div>
+
+    <div class="slides-viewport">
+        <div class="slides-track" id="sliderTrack">
+
+            <!-- Slide 1 -->
+            <div class="slide active">
+                <div class="slide-inner-content" style="justify-content: center; align-items: center; text-align: center;">
+                    <div style="display: inline-block; background: rgba(0,240,255,0.1); color: var(--accent-neon); padding: 8px 24px; border-radius: 30px; font-weight: 700; margin-bottom: 20px; border: 1px solid var(--accent-neon); box-shadow: 0 0 20px rgba(0,240,255,0.2); font-family: 'Fira Code', monospace;">
+                        Check_security_equipment
+                    </div>
+                    <h1>เปรียบเทียบ Linear กับ Cosine</h1>
+                    <p style="font-size: 1.4rem; margin-top: 10px; margin-bottom: 25px; color: var(--text-muted);">การวิเคราะห์ค่า Confidence ของโมเดล AI ด้วยวิธีสถิติแบบ Paired ผ่าน R Studio</p>
+                    
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 0 auto;">
+                        <div style="width: 100px; height: 100px; background: #fff; border-radius: 8px; border: 2px solid var(--accent-neon); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 15px rgba(0,240,255,0.3);">
+                            <span style="color: #000; font-size: 0.7rem; font-weight: 600; text-align: center; padding: 4px;">QR ลิงก์โครงงาน</span>
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">สแกนเพื่อทดลองใช้งาน</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>01 TOPIC: คำนำ Paired (Linear vs Cosine Lr)</h2>
+                    <p>โปรเจกต์นี้นำเสนอการเปรียบเทียบโมเดล AI ทั้ง 2 ตัว โดยทำการ train ด้วย Learning Rate ที่แตกต่างกัน ได้แก่ <span class="highlight">Linear Lr</span> และ <span class="highlight">Cosine Lr</span> เพื่อประเมินประสิทธิภาพการเรียนรู้ภายใต้ชุดข้อมูลเดียวกัน</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>องค์ประกอบหลัก</h3>
+                            <ul class="custom-list">
+                                <li><span class="highlight">Train:</span> กระบวนการฝึกสอนโมเดล AI</li>
+                                <li><span class="highlight">Test:</span> ชุดข้อมูลสำหรับทดสอบประสิทธิภาพ</li>
+                                <li><span class="highlight">Lr:</span> อัตราการเรียนรู้ (Learning Rate)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h3>วัตถุประสงค์การวิเคราะห์</h3>
+                            <p>เปรียบเทียบค่า Confidence เชิงสถิติรายคู่ (Paired comparison) ระหว่างการปรับ Learning Rate สองรูปแบบ เพื่อค้นหาแนวทางที่ให้ประสิทธิภาพสูงสุด</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>02-A DATA PREPARATION (Data Set แหล่งที่มาของเนื้อหา)</h2>
+                    <div class="grid-2" style="margin-bottom: 20px;">
+                        <div class="card" style="padding: 25px 30px;">
+                            <h3 style="font-size: 1.2rem; color: var(--accent-neon); margin-bottom: 15px;">คลาสและเครื่องมือ</h3>
+                            <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 12px; font-weight: 300; color: rgba(255,255,255,0.9);">
+                                การเตรียม Data Set ใช้รูปภาพสำหรับการตรวจจับ 3 คลาส ได้แก่ 
+                                <strong style="color: var(--accent-neon);">Helmet (หมวกนิรภัย)</strong>, 
+                                <strong style="color: var(--accent-pink);">Safety Vest (เสื้อนิรภัย)</strong> และ 
+                                <strong style="color: var(--accent-neon);">Human (คน)</strong> 
+                                จำนวนรวมทั้งสิ้น <strong style="color: var(--text-main); font-size: 1.15rem;">1100</strong> รูป
+                            </p>
+                            <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 0; font-weight: 300; color: rgba(255,255,255,0.9);">
+                                ข้อมูลภาพทั้งหมดถูกจัดการผ่านแอปพลิเคชัน <strong style="color: var(--text-main);">AI Training Studio</strong> ที่พัฒนาขึ้นเองในโปรเจกต์ <strong style="font-family: 'Fira Code', monospace; color: var(--accent-purple);">Check_security_equipment</strong> โดยใช้ระบบ <strong style="color: var(--text-main);">Smart Gallery</strong> ที่มี AI ช่วยค้นหาและตีกรอบวัตถุให้อัตโนมัติ ก่อนนำมาตรวจสอบความถูกต้อง
+                            </p>
+                        </div>
+                        
+                        <div class="card" style="padding: 25px 30px;">
+                            <h3 style="font-size: 1.2rem; color: var(--accent-neon); margin-bottom: 15px;">การแบ่งสัดส่วนข้อมูล</h3>
+                            <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 12px; font-weight: 300; color: rgba(255,255,255,0.9);">
+                                ในการเตรียมชุดข้อมูลเพื่อฝึกโมเดล ระบบได้ทำการแบ่งสัดส่วนข้อมูลอัตโนมัติเป็น 
+                                <strong style="color: var(--accent-neon);">Train 80%</strong>, 
+                                <strong style="color: var(--accent-pink);">Validation 10%</strong> และ 
+                                <strong style="color: var(--accent-pink);">Test 10%</strong>
+                            </p>
+                            <p style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 0; font-weight: 300; color: rgba(255,255,255,0.9);">
+                                พร้อมทั้งทำการเพิ่มความแม่นยำด้วยวิธี <strong style="color: var(--text-main); border-bottom: 1px dashed var(--accent-neon);">Data Augmentation</strong> (พลิกภาพซ้าย-ขวา และปรับแสงสว่าง) เพื่อให้โมเดลเรียนรู้ได้ดีขึ้นและมีประสิทธิภาพสูงสุดเมื่อนำไปใช้งานจริง
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(3, 7, 18, 0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 18px 25px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                        <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, var(--accent-neon), var(--accent-purple));"></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 8px;">
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.95rem; color: var(--text-main);">DuckDuckGo</div>
+                            <div style="color: var(--accent-neon); font-size: 1.1rem;">➔</div>
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.95rem; color: var(--text-main);">รูปภาพดิบ</div>
+                            <div style="color: var(--accent-neon); font-size: 1.1rem;">➔</div>
+                            <div style="background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.2); color: var(--accent-neon); padding: 8px 14px; border-radius: 8px; font-size: 0.95rem; font-weight: 500;">AI Training Studio <span style="font-size:0.85rem; font-weight:300; opacity:0.8;">(ตีกรอบอัตโนมัติ)</span></div>
+                            <div style="color: var(--accent-neon); font-size: 1.1rem;">➔</div>
+                            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 14px; border-radius: 8px; font-size: 0.95rem; color: var(--text-main);">ตรวจสอบความถูกต้อง</div>
+                            <div style="color: var(--accent-neon); font-size: 1.1rem;">➔</div>
+                            <div style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); color: white; padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.2);">Export ชุดข้อมูล</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>02-B DATA PIPELINE (จากภาพดิบสู่ข้อมูลที่ตรวจสอบแล้ว)</h2>
+                    <div class="card" style="padding: 15px 25px; display: flex; flex-direction: column; align-items: center; border-top: 1px solid rgba(0, 240, 255, 0.4); box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 30px rgba(0,240,255,0.03);">
+                        <div style="display: flex; justify-content: center; gap: 15px; width: 100%; margin-bottom: 10px;">
+                            <div style="flex: 1; height: 340px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3); box-shadow: 0 5px 20px rgba(0,240,255,0.1); background: #000; display: flex; align-items: center; justify-content: center;">
+                                <img src="asset/01.png" alt="Smart Gallery 1" style="width: 100% !important; height: 100% !important; object-fit: fill !important; display: block !important;">
+                            </div>
+                            <div style="flex: 1; height: 340px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 0, 122, 0.3); box-shadow: 0 5px 20px rgba(255,0,122,0.1); background: #000; display: flex; align-items: center; justify-content: center;">
+                                <img src="asset/02.png" alt="Smart Gallery 2" style="width: 100% !important; height: 100% !important; object-fit: fill !important; display: block !important;">
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%;">
+                            <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0; font-weight: 300; text-align: center;">
+                                ตัวอย่างหน้าจอระบบตรวจสอบภาพคลาสใน <strong style="color: var(--accent-neon);">Smart Gallery</strong>
+                            </p>
+                            <div style="background: rgba(3, 7, 18, 0.8); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 25px; padding: 8px 30px; display: flex; align-items: center; justify-content: center; gap: 15px; font-size: 0.95rem; font-weight: 500; width: fit-content;">
+                                <span style="color: var(--text-main);">ตรวจสอบ</span>
+                                <span style="color: var(--accent-neon);">➔</span>
+                                <span style="color: var(--text-main);">Refine</span>
+                                <span style="color: var(--accent-neon);">➔</span>
+                                <span style="color: var(--text-main);">Verify</span>
+                                <span style="color: var(--accent-neon);">➔</span>
+                                <span style="color: var(--accent-pink); font-weight: 700;">Commit</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide">
+                <div class="slide-inner-content" style="padding: 10px 25px;">
+                    <h2>03 MODEL TRAINING (การตั้งค่าการฝึก Detector)</h2>
+                    <p style="font-size: 0.85rem; margin-bottom: 10px;">เน้นฝึก Detector เพื่อระบุตำแหน่งวัตถุในภาพ (Object Detection) ภายใต้ตัวแปรควบคุมมาตรฐานเพื่อให้ผลลัพธ์มีความแม่นยำและเป็นธรรม</p>
+                    <div style="display: flex; justify-content: center; margin-bottom: 10px; width: 100%;">
+                        <div class="card" style="width: fit-content; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 12px 25px;">
+                            <h3 style="margin-bottom: 8px; font-size: 1.1rem; color: var(--accent-neon);">กราฟเปรียบเทียบ Linear กับ Cosine Learning Rate</h3>
+                            <div style="width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3); background: #030712; padding: 8px;">
+                                <svg viewBox="0 0 750 220" style="width: 680px; height: auto; max-height: 200px; display: block;">
+                                    <line x1="60" y1="25" x2="720" y2="25" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4" />
+                                    <line x1="60" y1="95" x2="720" y2="95" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4" />
+                                    <line x1="60" y1="165" x2="720" y2="165" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4" />
+                                    <line x1="60" y1="185" x2="720" y2="185" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" />
+                                    <line x1="60" y1="15" x2="60" y2="185" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" />
+                                    <text x="45" y="28" fill="rgba(255,255,255,0.8)" font-size="12" text-anchor="end">0.001</text>
+                                    <text x="45" y="99" fill="rgba(255,255,255,0.8)" font-size="12" text-anchor="end">0.0005</text>
+                                    <text x="45" y="189" fill="rgba(255,255,255,0.8)" font-size="12" text-anchor="end">0</text>
+                                    <text x="60" y="208" fill="rgba(255,255,255,0.8)" font-size="12">0</text>
+                                    <text x="385" y="208" fill="rgba(255,255,255,0.8)" font-size="12">250</text>
+                                    <text x="670" y="208" fill="rgba(255,255,255,0.8)" font-size="12">500 Epochs</text>
+                                    <line x1="60" y1="30" x2="700" y2="175" stroke="#00f0ff" stroke-width="3.5" />
+                                    <path d="M 60 30 Q 280 35, 430 135 T 700 178" fill="none" stroke="#ff007a" stroke-width="3.5" />
+                                    <g transform="translate(560, 20)">
+                                        <line x1="0" y1="0" x2="20" y2="0" stroke="#00f0ff" stroke-width="3.5" />
+                                        <text x="25" y="4" fill="#fff" font-size="12">Linear</text>
+                                        <line x1="0" y1="20" x2="20" y2="20" stroke="#ff007a" stroke-width="3.5" />
+                                        <text x="25" y="24" fill="#fff" font-size="12">Cosine</text>
+                                    </g>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-2" style="gap: 12px;">
+                        <div class="card" style="padding: 10px 15px;">
+                            <h3 style="font-size: 0.95rem; margin-bottom: 6px;">พารามิเตอร์ควบคุม (Controlled Variables)</h3>
+                            <ul class="custom-list" style="font-size: 0.85rem; line-height: 1.35;">
+                                <li><span class="highlight">Epochs:</span> 500 รอบการฝึก</li>
+                                <li><span class="highlight">Batch Size:</span> 8</li>
+                                <li><span class="highlight">Initial Learning Rate:</span> 0.00100 (โหมดสมดุล)</li>
+                            </ul>
+                        </div>
+                        <div class="card" style="padding: 10px 15px;">
+                            <h3 style="font-size: 0.95rem; margin-bottom: 6px;">ตัวแปรทดสอบ (Test Variables)</h3>
+                            <ul class="custom-list" style="font-size: 0.85rem; line-height: 1.35;">
+                                <li><span class="highlight">Linear Decay (Default):</span> ลดค่า LR ลงเป็นเส้นตรงตามรอบ</li>
+                                <li><span class="highlight">Cosine Annealing (cos_lr=True):</span> ลดค่า LR ตามฟังก์ชันโคไซน์ สมูทช่วงท้าย</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6 -->
+            <div class="slide">
+                <div class="slide-inner-content" style="padding: 12px 25px;">
+                    <h2 style="margin-bottom: 8px;">04 TEST SET (การนำข้อมูลไปทดสอบ)</h2>
+                    <p style="font-size: 1.1rem; margin-bottom: 12px;">รวบรวมภาพตัวอย่างจาก Google Search จำนวน <span class="highlight">912 ภาพ</span> นำมาทดสอบกับโมเดลทั้ง 2 ตัวเพื่อสกัดค่า <span class="highlight">Confidence Score</span> แบบจับคู่</p>
+                    <div class="grid-2" style="gap: 12px; margin-bottom: 12px;">
+                        <div class="card" style="padding: 12px 18px;">
+                            <h3 style="font-size: 1.15rem; margin-bottom: 6px; color: var(--accent-neon);">ที่มาและหมวดหมู่ข้อมูล (Data Sources)</h3>
+                            <ul class="custom-list" style="font-size: 1.1rem; line-height: 1.4; margin: 0;">
+                                <li><span class="highlight">Helmet:</span> 250 ภาพ (หมวกนิรภัย)</li>
+                                <li><span class="highlight">Safety Vest:</span> 200 ภาพ (เสื้อสะท้อนแสง)</li>
+                                <li><span class="highlight">Human:</span> 462 ภาพ (คนงาน/บุคคล)</li>
+                                <li style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 6px; padding-top: 6px;"><strong>รวมทั้งหมด: 912 ภาพ</strong></li>
+                            </ul>
+                        </div>
+                        <div class="card" style="padding: 12px 18px;">
+                            <h3 style="font-size: 1.15rem; margin-bottom: 6px; color: var(--accent-neon);">หลักการจับคู่ข้อมูล (Paired Structure)</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.4; margin: 0;">ภาพเดียวกันจะถูกทำนายโดยโมเดล <strong>Linear</strong> และ <strong>Cosine</strong> จากนั้นนำค่า Confidence Score ที่ได้มาจับคู่กันในแถวเดียว (Row-by-Row) รวมทั้งหมด 912 คู่ เพื่อใช้วิเคราะห์ความแตกต่างทางสถิติต่อไป</p>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 12px 18px;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 8px; text-align: center;">ตัวอย่างชุดข้อมูลที่ใช้ทดสอบ (Data Preview)</h3>
+                        <div style="width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3);">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 1.05rem; text-align: left; background: #030712;">
+                                <thead>
+                                    <tr style="background: rgba(0, 240, 255, 0.1); color: var(--accent-neon);">
+                                        <th style="padding: 6px 15px; border-bottom: 1px solid rgba(0, 240, 255, 0.3);">Image_Name</th>
+                                        <th style="padding: 6px 15px; border-bottom: 1px solid rgba(0, 240, 255, 0.3);">Linear_Confidence</th>
+                                        <th style="padding: 6px 15px; border-bottom: 1px solid rgba(0, 240, 255, 0.3);">Cosine_Confidence</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 5px 15px;">helmet\-.webp</td>
+                                        <td style="padding: 5px 15px; color: #ffeb3b;">0.6764643200</td>
+                                        <td style="padding: 5px 15px; color: #ffeb3b;">0.6589509800</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                        <td style="padding: 5px 15px;">helmet\-1-mp4.webp</td>
+                                        <td style="padding: 5px 15px; color: #ff4c4c;">0.0449091100</td>
+                                        <td style="padding: 5px 15px; color: #ff9800;">0.6120632900</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 5px 15px;">helmet\2F0012F947..._blue.png</td>
+                                        <td style="padding: 5px 15px; color: #81c784;">0.7741223600</td>
+                                        <td style="padding: 5px 15px; color: #ff7043;">0.4210037900</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>05-A PAIRED DESIGN & HYPOTHESIS</h2>
+                    <p>การออกแบบการวิเคราะห์แบบจับคู่ (Paired Design) บนหน่วยสังเกตเดียวกันจำนวน 912 คู่ข้อมูล</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>สมมติฐานทางสถิติ</h3>
+                            <ul class="custom-list" style="margin-bottom: 20px;">
+                                <li><span class="highlight">H0:</span> ค่ากลางของผลต่าง = 0 <br>(ทั้งสองโมเดลให้ผลลัพธ์ไม่แตกต่างกัน)</li>
+                                <li><span class="highlight">H1:</span> ค่ากลางของผลต่าง ≠ 0 <br>(ทั้งสองโมเดลให้ผลลัพธ์แตกต่างกัน)</li>
+                            </ul>
+                            <div class="formula-container">
+                                <math display="math" xmlns="http://www.w3.org/1998/Math/MathML">
+                                    <msub><mtext>H</mtext><mn>0</mn></msub><mo>:</mo>
+                                    <msub><mover><mi>μ</mi><mo>~</mo></mover><mi>D</mi></msub><mo>=</mo><mn>0</mn>
+                                </math>
+                            </div>
+                            <div class="formula-container" style="margin-bottom: 0;">
+                                <math display="math" xmlns="http://www.w3.org/1998/Math/MathML">
+                                    <msub><mtext>H</mtext><mn>1</mn></msub><mo>:</mo>
+                                    <msub><mover><mi>μ</mi><mo>~</mo></mover><mi>D</mi></msub><mo>≠</mo><mn>0</mn>
+                                </math>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>ทำไมถึงใช้ Wilcoxon Test?</h3>
+                            <ul class="custom-list">
+                                <li>วิเคราะห์ข้อมูลแบบจับคู่ (Paired Design) จำนวน 912 คู่ข้อมูล</li>
+                                <li>เนื่องจากข้อมูล <strong>"ไม่มีการแจกแจงแบบปกติ" (Non-normal)</strong></li>
+                                <li>จึงไม่สามารถใช้ Paired t-test ได้ ต้องใช้สถิตินอนพาราเมทริก (Non-parametric) ตัวนี้แทน</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>05-B R SCRIPT & CONSOLE OUTPUT</h2>
+                    <p>ผลการตรวจสอบการแจกแจงของข้อมูลและการทดสอบสมมติฐานด้วย Wilcoxon Test</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>R Script (คำสั่ง)</h3>
+                            <div class="code-box" style="white-space: normal; color: #E0E0E0; font-size: 14px; line-height: 1.6;">
+                                <span style="color: #64B5F6;">attach</span>(DATA_1)<br><br>
+                                <span style="color: #4CAF50;"># 1. ตรวจสอบการแจกแจงปกติ</span><br>
+                                <span style="color: #64B5F6;">shapiro.test</span>(Linear_Confidence)<br>
+                                <span style="color: #64B5F6;">shapiro.test</span>(Cosine_Confidence)<br><br>
+                                <span style="color: #4CAF50;"># 2. ทดสอบความแตกต่างด้วย Wilcoxon</span><br>
+                                <span style="color: #64B5F6;">wilcox.test</span>(Linear_Confidence, Cosine_Confidence, paired=<span style="color: #FFCA28;">TRUE</span>)
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Console (ผลลัพธ์)</h3>
+                            <div class="code-box" style="white-space: normal; color: #E0E0E0; font-size: 14px; line-height: 1.6;">
+                                <span style="color: #4CAF50;">&gt; shapiro.test(Linear_Confidence)</span><br>
+                                W = 0.71235, p-value &lt; <span style="color: #FFCA28;">2.2e-16</span><br>
+                                <span style="color: #FFCA28;"># p-value &lt; 0.05 ➔ ข้อมูลไม่แจกแจงแบบปกติ</span><br><br>
+                                <span style="color: #4CAF50;">&gt; shapiro.test(Cosine_Confidence)</span><br>
+                                W = 0.79717, p-value &lt; <span style="color: #FFCA28;">2.2e-16</span><br>
+                                <span style="color: #FFCA28;"># p-value &lt; 0.05 ➔ ข้อมูลไม่แจกแจงแบบปกติ</span><br><br>
+                                <span style="color: #4CAF50;">&gt; wilcox.test(Linear, Cosine, paired=TRUE)</span><br>
+                                V = 284033, p-value &lt; <span style="color: #FFCA28;">2.2e-16</span><br>
+                                alt. hypothesis: true location shift is not equal to 0
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>06 INFERENCE (ผลการทดสอบ Wilcoxon Paired Test)</h2>
+                    <p>ผลลัพธ์จากการรันคำสั่งใน RStudio พร้อม continuity correction (N = 912 คู่)</p>
+                    <div class="card" style="margin-top: 25px;">
+                        <ul class="custom-list" style="font-size: 1.25rem;">
+                            <li><span class="highlight">Wilcoxon Statistic (V):</span> 284,033</li>
+                            <li><span class="highlight">P-value:</span> <span style="color: var(--accent-neon); font-weight: 700; font-size: 1.5rem;">&lt; 2.2e-16</span> (มีนัยสำคัญทางสถิติสูงมาก)</li>
+                            <li><span class="highlight">Alternative Hypothesis:</span> True location shift is not equal to 0</li>
+                        </ul>
+                        <p style="margin-top: 25px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; font-size: 1.3rem;">
+                            <span style="color: var(--accent-pink); font-weight: 700; border: 1px solid var(--accent-pink); padding: 5px 15px; border-radius: 8px; margin-right: 15px;">ข้อสรุป</span> 
+                            ปฏิเสธสมมติฐานหลัก (H0) ยืนยันว่า <span class="highlight">Linear</span> และ <span class="highlight">Cosine</span> ให้ค่า Confidence แตกต่างกันอย่างมีนัยสำคัญ
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>07-A R SCRIPT & CONSOLE OUTPUT</h2>
+                    <p>หลังจากทราบว่าทั้งสองโมเดลมีความแตกต่างกันทางสถิติ ขั้นตอนนี้จึงเป็นการตรวจสอบค่ามัธยฐานและสถิติสรุปเพื่อดูทิศทางของข้อมูล</p>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>R Script (คำสั่ง)</h3>
+                            <div class="code-box" style="white-space: normal; color: #E0E0E0; font-size: 14px; line-height: 1.6;">
+                                <span style="color: #4CAF50;"># 1. ตรวจสอบค่ามัธยฐาน (Median)</span><br>
+                                <span style="color: #64B5F6;">median</span>(Linear_Confidence)<br>
+                                <span style="color: #64B5F6;">median</span>(Cosine_Confidence)<br><br>
+                                <span style="color: #4CAF50;"># 2. ตรวจสอบสถิติสรุปย่อ (Summary)</span><br>
+                                <span style="color: #64B5F6;">summary</span>(Linear_Confidence)<br>
+                                <span style="color: #64B5F6;">summary</span>(Cosine_Confidence)
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3>Console (ผลลัพธ์)</h3>
+                            <div class="code-box" style="white-space: normal; color: #E0E0E0; font-size: 14px; line-height: 1.6;">
+                                <span style="color: #4CAF50;">&gt; median(Linear_Confidence)</span><br>
+                                [1] <span style="color: #FFCA28;">0.9015519</span><br><br>
+                                <span style="color: #4CAF50;">&gt; median(Cosine_Confidence)</span><br>
+                                [1] <span style="color: #FFCA28;">0.843856</span><br><br>
+                                <span style="color: #4CAF50;">&gt; summary(Linear_Confidence)</span><br>
+                                Min. 1st Qu. Median Mean 3rd Qu. Max.<br>
+                                0.0000 0.7731 <span style="color: #FFCA28;">0.9016</span> 0.8111 0.9447 0.9907
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top: 20px; padding: 15px 25px;">
+                        <p style="margin-bottom: 0; font-size: 1.1rem; color: var(--text-main);">
+                            <span class="highlight" style="color: var(--accent-neon);">เป้าหมายของขั้นตอนนี้:</span> ตรวจสอบค่ามัธยฐานและสรุปสภาพกระจายตัวของข้อมูล เพื่อดูว่าโมเดลไหนให้ค่าความมั่นใจสูงกว่ากัน
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>07-B DIRECTION & DISTRIBUTION (ทิศทางและการกระจายตัว)</h2>
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>วิธี (Model)</th>
+                                <th>Min</th>
+                                <th>Q1</th>
+                                <th>Median (มัธยฐาน)</th>
+                                <th>Mean (ค่าเฉลี่ย)</th>
+                                <th>Q3</th>
+                                <th>Max</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="highlight">Linear LR</span></td>
+                                <td>0.0000</td>
+                                <td>0.7731</td>
+                                <td style="color: var(--accent-neon); font-weight: 700; font-size: 1.3rem;">0.9016</td>
+                                <td>0.8111</td>
+                                <td>0.9447</td>
+                                <td>0.9907</td>
+                            </tr>
+                            <tr>
+                                <td><span class="highlight">Cosine LR</span></td>
+                                <td>0.0000</td>
+                                <td>0.6954</td>
+                                <td style="color: var(--accent-pink); font-weight: 700; font-size: 1.3rem;">0.8439</td>
+                                <td>0.7587</td>
+                                <td>0.9162</td>
+                                <td>0.9863</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="card" style="margin-top: 25px;">
+                        <p style="margin-bottom: 0;"><strong>วิเคราะห์ทิศทาง:</strong> โมเดลแบบ Linear มีค่ามัธยฐานสูงกว่า Cosine ประมาณ <span class="highlight">+0.0577 (~5.77 จุดเปอร์เซ็นต์)</span> และมีค่าสูงกว่าใน 5 จาก 6 ค่าสถิติสรุปข้างต้น ซึ่งชี้ชัดว่า <span class="highlight">Linear ให้ความมั่นใจสูงกว่า</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 12 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>08 CONCLUSION (ข้อสรุปภาพรวมโปรเจกต์)</h2>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3>สรุปผลการทดลอง</h3>
+                            <ul class="custom-list">
+                                <li><span class="highlight">โมเดลที่เด่นกว่า:</span> Linear Lr มีประสิทธิภาพเหนือกว่า Cosine Lr บนชุดข้อมูลนี้</li>
+                                <li><span class="highlight">เหตุผล:</span> Median ของ Linear (0.9016) ใกล้เคียง 1 มากที่สุด บ่งบอกถึงประสิทธิภาพการเรียนรู้ที่ดีเยี่ยม</li>
+                                <li><span class="highlight">ภาพรวม:</span> ทั้ง 2 โมเดลจัดอยู่ในเกณฑ์ดีมากเพราะค่าเข้าใกล้ 1</li>
+                            </ul>
+                        </div>
+                        <div class="card" style="display: flex; flex-direction: column;">
+                            <h3>สรุปสถิติสำคัญ</h3>
+                            <ul class="custom-list">
+                                <li>สถิติที่ใช้: <span class="highlight">Wilcoxon paired test</span></li>
+                                <li>ระดับนัยสำคัญ: <span class="highlight">p &lt; 2.2e-16</span></li>
+                                <li>ผลต่างมัธยฐาน: <span class="highlight">+5.77 pp (Linear สูงกว่า)</span></li>
+                            </ul>
+                            <div style="margin-top: auto; padding: 20px; background: rgba(0,240,255,0.05); border-radius: 12px; border: 1px dashed rgba(0,240,255,0.3); text-align: center;">
+                                <span style="color: var(--accent-neon); font-size: 1.2rem; font-weight: 600;">END OF PRESENTATION</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 13 -->
+            <div class="slide">
+                <div class="slide-inner-content">
+                    <h2>09 TEAM MEMBERS & QR CODE</h2>
+                    <p>รายชื่อสมาชิกในทีมผู้จัดทำและการเข้าถึงโครงงาน</p>
+                    
+                    <div class="grid-2" style="grid-template-columns: 1.3fr 0.7fr; gap: 20px; align-items: start;">
+                        <div class="card" style="padding: 18px 25px;">
+                            <h3 style="font-size: 1.15rem; margin-bottom: 10px; color: var(--accent-neon);">รายชื่อสมาชิกในทีม (7 คน)</h3>
+                            <ul class="custom-list" style="font-size: 0.9rem; line-height: 1.4; margin: 0;">
+                                <li style="margin-bottom: 10px;"><span class="highlight">ชื่อ-นามสกุล 1:</span> หัวหน้าโปรเจกต์ / พัฒนาโมเดล AI</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">ชื่อ-นามสกุล 2:</span> พัฒนาซอฟต์แวร์ / ระบบหลังบ้าน</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">ชื่อ-นามสกุล 3:</span> ออกแบบและจัดการชุดข้อมูล (Dataset)</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">ชื่อ-นามสกุล 4:</span> วิเคราะห์ข้อมูลทางสถิติและทดสอบ</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">ชื่อ-นามสกุล 5:</span> ออกแบบ UI/UX และหน้าเว็บพรีเซนต์</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">ชื่อ-นามสกุล 6:</span> ตรวจสอบความถูกต้องและเอกสาร</li>
+                                <li style="margin-bottom: 0;"><span class="highlight">ชื่อ-นามสกุล 7:</span> นำเสนอผลงานและจัดทำรายงาน</li>
+                            </ul>
+                        </div>
+
+                        <div class="card" style="padding: 18px 25px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                            <h3 style="font-size: 1.15rem; margin-bottom: 12px; color: var(--accent-pink); text-align: center;">เข้าถึง Source Code</h3>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                <div style="width: 200px; height: 200px; background: #fff; border-radius: 10px; border: 2px solid var(--accent-pink); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 25px rgba(255,0,122,0.4);">
+                                    <img src="asset/qrcode1.png" alt="QR GitHub" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">สแกนเพื่อดูรายละเอียดบน drive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="slide-footer">
+        <button class="btn" id="prevBtn" onclick="changeSlide(-1)" disabled>
+            ← ก่อนหน้า
+        </button>
+        <div class="dots-container" id="dotsContainer"></div>
+        <button class="btn" id="nextBtn" onclick="changeSlide(1)">
+            ถัดไป →
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentSlide = 0;
+    const totalSlides = 13;
+
+    const track = document.getElementById('sliderTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideTag = document.getElementById('slideTag');
+    const progressBar = document.getElementById('progressBar');
+    const dotsContainer = document.getElementById('dotsContainer');
+
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('dot');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToStreamSlide(i));
+        dotsContainer.appendChild(dot);
+    }
+
+    const dots = dotsContainer.querySelectorAll('.dot');
+    const slides = track.querySelectorAll('.slide');
+
+    function changeSlide(direction) {
+        currentSlide += direction;
+        if (currentSlide < 0) currentSlide = 0;
+        if (currentSlide >= totalSlides) currentSlide = totalSlides - 1;
+        updatePosition();
+    }
+
+    function goToStreamSlide(index) {
+        currentSlide = index;
+        updatePosition();
+    }
+
+    function updatePosition() {
+        track.style.transform = `translateX(-${currentSlide * 100}vw)`;
+        slides.forEach((slide, index) => {
+            slide.classList.toggle('active', index === currentSlide);
+        });
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+        slideTag.textContent = `Slide ${currentSlide + 1} / ${totalSlides}`;
+        progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+            if (currentSlide < totalSlides - 1) changeSlide(1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            if (currentSlide > 0) changeSlide(-1);
+        }
+    });
+
+    updatePosition();
+</script>
+
+</body>
+</html>
