@@ -413,10 +413,10 @@
 
             <!-- Slide 1 -->
             <div class="slide active">
-                <div class="slide-inner-content" style="justify-content: center; align-items: center; text-align: center; height: 100%; position: relative;">
+                <div class="slide-inner-content" style="position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
                     
-                    <!-- หัวข้อหลักอยู่ตรงกลางจอแบบสมบูรณ์ -->
-                    <div style="display: flex; flex-direction: column; align-items: center;">
+                    <!-- หัวข้อหลักอยู่กึ่งกลางหน้าจอจริง ๆ -->
+                    <div style="display: flex; flex-direction: column; align-items: center; transform: translateY(-20px);">
                         <div style="display: inline-block; background: rgba(0,240,255,0.1); color: var(--accent-neon); padding: 6px 20px; border-radius: 30px; font-weight: 700; margin-bottom: 15px; border: 1px solid var(--accent-neon); box-shadow: 0 0 20px rgba(0,240,255,0.2); font-family: 'Fira Code', monospace; font-size: 0.9rem;">
                             Check_security_equipment
                         </div>
@@ -424,9 +424,9 @@
                         <p style="font-size: 1.25rem; color: var(--text-muted); margin: 0;">การวิเคราะห์ค่า Confidence ของโมเดล AI ด้วยวิธีสถิติแบบ Paired ผ่าน R Studio</p>
                     </div>
                     
-                    <!-- QR Code ขนาดใหญ่ จัดวางลอยไว้มุมขวาล่าง ไม่มากวนกึ่งกลางหน้าจอ -->
-                    <div style="position: absolute; right: 20px; bottom: 10px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                        <div style="width: 170px; height: 170px; background: #fff; border-radius: 12px; border: 3px solid var(--accent-neon); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 30px rgba(0,240,255,0.4);">
+                    <!-- QR Code ขนาดใหญ่ วางไว้ด้านล่างแบบลงตัว -->
+                    <div style="position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <div style="width: 160px; height: 160px; background: #fff; border-radius: 12px; border: 3px solid var(--accent-neon); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 30px rgba(0,240,255,0.4);">
                             <img src="asset/qrcode2.png" alt="QR Link" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <span style="font-size: 0.95rem; color: var(--text-main); font-weight: 600; text-shadow: 0 0 10px rgba(0,240,255,0.3);">สแกนเพื่อดูหน้าเว็บไซต์</span>
