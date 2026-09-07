@@ -846,27 +846,28 @@
                     <h2>09 TEAM MEMBERS & QR CODE</h2>
                     <p style="margin-bottom: 20px;">รายชื่อสมาชิกในทีมผู้จัดทำและการเข้าถึงโครงงาน</p>
 
-                    <div class="grid-2" style="grid-template-columns: 1.6fr 1fr; gap: 25px; align-items: stretch;">
+                    <!-- ปรับสัดส่วนเป็น 2fr 1fr เพื่อเพิ่มพื้นที่ฝั่งซ้ายให้มากขึ้น -->
+                    <div class="grid-2" style="grid-template-columns: 2fr 1fr; gap: 20px; align-items: center;">
                         
-                        <!-- ฝั่งซ้าย: รายชื่อสมาชิก (ปรับพื้นที่ให้กว้างขึ้นและจัดระเบียบใหม่) -->
-                        <div class="card" style="padding: 20px 25px; display: flex; flex-direction: column; justify-content: center;">
-                            <h3 style="font-size: 1.15rem; margin-bottom: 12px; color: var(--accent-neon);">รายชื่อสมาชิกในทีม (7 คน)</h3>
-                            <ul class="custom-list" style="font-size: 0.85rem; line-height: 1.5; margin: 0;">
-                                <li style="margin-bottom: 8px;"><span class="highlight">68101476 จิรายุ อติซักดิ์:</span> เทรนโมเดล / หาภาพสำหรับเทรน / พัฒนาหน้าเว็บพรีเซนต์</li>
-                                <li style="margin-bottom: 8px;"><span class="highlight">68103019 ธรรณธร ปิติ:</span> เปรียบเทียบ Confidence Model / จัดทำสไลด์นำเสนอต้นฉบับ</li>
-                                <li style="margin-bottom: 8px;"><span class="highlight">68115906 วชิราวิทย์ เทียมเลิศ:</span> วิเคราะห์ข้อมูลและหาค่าสถิติผ่าน RStudio</li>
-                                <li style="margin-bottom: 8px;"><span class="highlight">68119841 ศิวะ สุชนทัศนา:</span> Research test Data Set Helmet / ร่วมออกแบบโครงสร้างสไลด์</li>
-                                <li style="margin-bottom: 8px;"><span class="highlight">68118611 กฤตินันท์ ศิริเขต:</span> หา test Data Set Safety vest / ร่วมออกแบบโครงสร้างสไลด์</li>
-                                <li style="margin-bottom: 8px;"><span class="highlight">68114677 บุญญฤทธิ์ สุวรรณโชติ:</span> หา test Data Set Human</li>
+                        <!-- ฝั่งซ้าย: รายชื่อสมาชิก (ตัวอักษรขนาด 0.9rem เท่าเดิม) -->
+                        <div class="card" style="padding: 20px 25px;">
+                            <h3 style="font-size: 1.15rem; margin-bottom: 15px; color: var(--accent-neon);">รายชื่อสมาชิกในทีม (7 คน)</h3>
+                            <ul class="custom-list" style="font-size: 0.9rem; line-height: 1.4; margin: 0;">
+                                <li style="margin-bottom: 10px;"><span class="highlight">68101476 จิรายุ อติซักดิ์:</span> เทรนโมเดล / หาภาพสำหรับเทรน / พัฒนาหน้าเว็บพรีเซนต์</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">68103019 ธรรณธร ปิติ:</span> เปรียบเทียบ Confidence Model / จัดทำสไลด์นำเสนอต้นฉบับ</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">68115906 วชิราวิทย์ เทียมเลิศ:</span> วิเคราะห์ข้อมูลและหาค่าสถิติผ่าน RStudio</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">68119841 ศิวะ สุชนทัศนา:</span> Research test Data Set Helmet / ร่วมออกแบบโครงสร้างสไลด์</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">68118611 กฤตินันท์ ศิริเขต:</span> หา test Data Set Safety vest / ร่วมออกแบบโครงสร้างสไลด์</li>
+                                <li style="margin-bottom: 10px;"><span class="highlight">68114677 บุญญฤทธิ์ สุวรรณโชติ:</span> หา test Data Set Human</li>
                                 <li style="margin-bottom: 0;"><span class="highlight">68119759 รชต มากบรรจง:</span> หา test Data Set Human</li>
                             </ul>
                         </div>
 
-                        <!-- ฝั่งขวา: QR Code (จัดให้อยู่กึ่งกลางพอดี) -->
-                        <div class="card" style="padding: 20px 25px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <!-- ฝั่งขวา: QR Code (เอากรอบ card ออก ให้ลอยอยู่กับตัวอักษร) -->
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                             <h3 style="font-size: 1.15rem; margin-bottom: 15px; color: var(--accent-pink); text-align: center;">เข้าถึง Source Code</h3>
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                                <div style="width: 170px; height: 170px; background: #fff; border-radius: 10px; border: 2px solid var(--accent-pink); display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 25px rgba(255,0,122,0.4);">
+                                <div style="width: 200px; height: 200px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 0 25px rgba(255,0,122,0.2);">
                                     <img src="asset/qrcode1.png" alt="QR GitHub" style="width: 100%; height: 100%; object-fit: cover;">
                                 </div>
                                 <span style="font-size: 0.85rem; color: var(--text-muted);">สแกนเพื่อดูรายละเอียดบน drive</span>
