@@ -846,10 +846,10 @@
                     <h2>09 TEAM MEMBERS & QR CODE</h2>
                     <p style="margin-bottom: 20px;">รายชื่อสมาชิกในทีมผู้จัดทำและการเข้าถึงโครงงาน</p>
 
-                    <!-- ปรับสัดส่วนเป็น 2fr 1fr เพื่อเพิ่มพื้นที่ฝั่งซ้ายให้มากขึ้น -->
-                    <div class="grid-2" style="grid-template-columns: 2fr 1fr; gap: 20px; align-items: center;">
+                    <!-- เพิ่มพื้นที่ฝั่งซ้ายให้กินที่มากขึ้น (2.8fr) -->
+                    <div class="grid-2" style="grid-template-columns: 2.8fr 1fr; gap: 20px; align-items: center;">
                         
-                        <!-- ฝั่งซ้าย: รายชื่อสมาชิก (ตัวอักษรขนาด 0.9rem เท่าเดิม) -->
+                        <!-- ฝั่งซ้าย: รายชื่อสมาชิก -->
                         <div class="card" style="padding: 20px 25px;">
                             <h3 style="font-size: 1.15rem; margin-bottom: 15px; color: var(--accent-neon);">รายชื่อสมาชิกในทีม (7 คน)</h3>
                             <ul class="custom-list" style="font-size: 0.9rem; line-height: 1.4; margin: 0;">
@@ -863,7 +863,7 @@
                             </ul>
                         </div>
 
-                        <!-- ฝั่งขวา: QR Code (เอากรอบ card ออก ให้ลอยอยู่กับตัวอักษร) -->
+                        <!-- ฝั่งขวา: QR Code -->
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
                             <h3 style="font-size: 1.15rem; margin-bottom: 15px; color: var(--accent-pink); text-align: center;">เข้าถึง Source Code</h3>
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
@@ -877,7 +877,7 @@
                     </div>
                 </div>
             </div>
-
+            
         </div>
     </div>
 
