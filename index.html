@@ -25,7 +25,6 @@
         }
 
         body {
-            /* พื้นหลังสีดำสนิทสำหรับแถบที่ล้น (Letterbox) */
             background-color: #000000;
             display: flex;
             justify-content: center;
@@ -37,17 +36,12 @@
         }
 
         .presentation-container {
-            /* ฟิกซ์ขนาดเท่าหน้าจอคอม 1920x1080 */
             width: 1920px;
             height: 1080px;
             flex-shrink: 0;
-            
-            /* ตีกรอบให้สวยงาม */
             border: 2px solid var(--accent-neon);
             border-radius: 16px;
             box-shadow: 0 0 40px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(112, 0, 255, 0.1);
-            
-            /* ย้ายลวดลายพื้นหลังมาไว้ในกรอบ */
             background-color: var(--bg-deep);
             background-image: 
                 radial-gradient(circle at 10% 10%, rgba(112, 0, 255, 0.15) 0%, transparent 50%),
@@ -55,15 +49,13 @@
                 linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
                 linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
             background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
-            
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            transform-origin: center center; /* จุดศูนย์กลางในการย่อ/ขยาย */
+            transform-origin: center center;
         }
 
-        /* Top Glow Line */
         .progress-bar-container {
             width: 100%;
             height: 6px;
@@ -82,7 +74,6 @@
             box-shadow: 0 0 15px var(--accent-neon);
         }
 
-        /* Header */
         .slide-header {
             padding: 20px 40px 14px 40px;
             display: flex;
@@ -112,7 +103,6 @@
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
         }
 
-        /* Viewport */
         .slides-viewport {
             flex: 1;
             position: relative;
@@ -126,7 +116,7 @@
         }
 
         .slide {
-            min-width: 1920px; /* บังคับความกว้างสไลด์ให้เท่าคอนเทนเนอร์ */
+            min-width: 1920px;
             height: 100%;
             padding: 40px 80px;
             display: flex;
@@ -154,7 +144,6 @@
             flex: 1;
         }
 
-        /* Typography */
         .slide h1 {
             font-size: 3.8rem;
             color: var(--text-main);
@@ -195,7 +184,6 @@
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
         }
 
-        /* Cards / Grids */
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -231,7 +219,6 @@
             font-weight: 700;
         }
 
-        /* Lists */
         ul.custom-list {
             list-style: none;
         }
@@ -254,7 +241,11 @@
             color: var(--accent-neon);
         }
 
-        /* Table */
+        /* --- แก้ไขปัญหาช่องในตารางหาย --- */
+        td {
+            color: var(--text-main); /* บังคับให้ทุกช่องในตารางเป็นสีขาวเสมอ */
+        }
+
         .styled-table {
             width: 100%;
             border-collapse: separate;
@@ -271,6 +262,7 @@
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 1.1rem;
+            color: var(--text-main); /* ย้ำบังคับสีอีกชั้นใน class ของตาราง */
         }
 
         .styled-table th {
@@ -284,7 +276,6 @@
             border-bottom: none;
         }
 
-        /* Code Box */
         .code-box {
             background: #02040a;
             border: 1px solid rgba(112, 0, 255, 0.4);
@@ -299,7 +290,6 @@
             white-space: pre-wrap;
         }
 
-        /* Math formula */
         math {
             font-family: 'Prompt', sans-serif;
             font-size: 1.8rem;
@@ -314,7 +304,6 @@
             margin-bottom: 15px;
         }
 
-        /* Footer */
         .slide-footer {
             padding: 20px 40px;
             background: rgba(3, 7, 18, 0.9);
@@ -381,7 +370,6 @@
             box-shadow: 0 0 15px var(--accent-neon);
         }
 
-        /* Scrollbar */
         .slide::-webkit-scrollbar {
             width: 6px;
         }
@@ -390,7 +378,6 @@
             border-radius: 3px;
         }
 
-        /* Fullscreen Button */
         .fullscreen-btn {
             position: fixed;
             top: 25px;
@@ -557,7 +544,7 @@
                     <p style="font-size: 0.85rem; margin-bottom: 10px;">เน้นฝึก Detector เพื่อระบุตำแหน่งวัตถุในภาพ (Object Detection) ภายใต้ตัวแปรควบคุมมาตรฐานเพื่อให้ผลลัพธ์มีความแม่นยำและเป็นธรรม</p>
                     <div style="display: flex; justify-content: center; margin-bottom: 10px; width: 100%;">
                         <div class="card" style="width: fit-content; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 12px 25px;">
-                            <h3 style="margin-bottom: 8px; font-size: 1.1rem; color: var(--accent-neon);">กราเปรียบเทียบ Linear กับ Cosine Learning Rate</h3>
+                            <h3 style="margin-bottom: 8px; font-size: 1.1rem; color: var(--accent-neon);">กราฟเปรียบเทียบ Linear กับ Cosine Learning Rate</h3>
                             <div style="width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3); background: #030712; padding: 8px;">
                                 <svg viewBox="0 0 750 220" style="width: 680px; height: auto; max-height: 200px; display: block;">
                                     <line x1="60" y1="25" x2="720" y2="25" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4" />
@@ -906,7 +893,6 @@
     </div>
 </div>
 
-<!-- แก้ไข: ย้ายปุ่ม fullscreen ออกมาไว้นอกแท็ก <script> แล้ว -->
 <button id="fullscreenBtn" class="fullscreen-btn">⛶</button>
 
 <script>
@@ -945,7 +931,6 @@
     }
 
     function updatePosition() {
-        // ใช้ 1920px (ขนาดจริงของสไลด์) แทน vw เพื่อให้เลื่อนได้แม่นยำแม้โดนย่อ
         track.style.transform = `translateX(-${currentSlide * 1920}px)`;
         slides.forEach((slide, index) => {
             slide.classList.toggle('active', index === currentSlide);
@@ -959,15 +944,10 @@
         nextBtn.disabled = currentSlide === totalSlides - 1;
     }
 
-    // ฟังก์ชันคำนวณและปรับขนาดอัตโนมัติ (Scale Down)
     function scaleToFit() {
         const windowWidth = window.innerWidth;
         const windowHeight = window.innerHeight;
-        
-        // คำนวณอัตราส่วนการย่อ ให้เหลือขอบพื้นที่เผื่อกรอบสวยๆ 2% (0.98)
         const scale = Math.min(windowWidth / 1920, windowHeight / 1080) * 0.98;
-        
-        // ย่อส่วน Presentation ทั้งหมด
         presentationContainer.style.transform = `scale(${scale})`;
     }
 
@@ -979,12 +959,10 @@
         }
     });
 
-    // เรียกทำงานเมื่อโหลดหน้าและเมื่อมีการปรับขนาดจอ
     window.addEventListener('resize', scaleToFit);
     scaleToFit();
     updatePosition();
     
-    // ระบบทำงานของปุ่ม Fullscreen
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     fullscreenBtn.addEventListener('click', () => {
         if (!document.fullscreenElement) {
