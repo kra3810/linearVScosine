@@ -389,6 +389,27 @@
             background: rgba(0, 240, 255, 0.3);
             border-radius: 3px;
         }
+        .fullscreen-btn {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 9999;
+            background: rgba(3, 7, 18, 0.8);
+            color: var(--accent-neon);
+            border: 1px solid var(--accent-neon);
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            transition: all 0.3s ease;
+            line-height: 1;
+        }
+        .fullscreen-btn:hover {
+            background: var(--accent-neon);
+            color: var(--bg-deep);
+            box-shadow: 0 0 25px var(--accent-neon);
+        }
     </style>
 </head>
 <body>
@@ -945,6 +966,8 @@
         presentationContainer.style.transform = `scale(${scale})`;
     }
 
+    <button id="fullscreenBtn" class="fullscreen-btn">⛶</button>
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' || e.key === 'PageDown') {
             if (currentSlide < totalSlides - 1) changeSlide(1);
@@ -957,6 +980,16 @@
     window.addEventListener('resize', scaleToFit);
     scaleToFit();
     updatePosition();
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => console.log(err));
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    });
 </script>
 
 </body>
