@@ -26,6 +26,7 @@
 
         body {
             background-color: #000000;
+            color: var(--text-main); /* แก้ไข: นำคำสั่งสีขาวกลับมาใส่เพื่อไม่ให้ข้อความกลืนกับพื้นหลัง */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -241,11 +242,6 @@
             color: var(--accent-neon);
         }
 
-        /* --- แก้ไขปัญหาช่องในตารางหาย --- */
-        td {
-            color: var(--text-main); /* บังคับให้ทุกช่องในตารางเป็นสีขาวเสมอ */
-        }
-
         .styled-table {
             width: 100%;
             border-collapse: separate;
@@ -262,7 +258,6 @@
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 1.1rem;
-            color: var(--text-main); /* ย้ำบังคับสีอีกชั้นใน class ของตาราง */
         }
 
         .styled-table th {
