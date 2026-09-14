@@ -389,6 +389,8 @@
             background: rgba(0, 240, 255, 0.3);
             border-radius: 3px;
         }
+
+        /* Fullscreen Button */
         .fullscreen-btn {
             position: fixed;
             top: 25px;
@@ -555,7 +557,7 @@
                     <p style="font-size: 0.85rem; margin-bottom: 10px;">เน้นฝึก Detector เพื่อระบุตำแหน่งวัตถุในภาพ (Object Detection) ภายใต้ตัวแปรควบคุมมาตรฐานเพื่อให้ผลลัพธ์มีความแม่นยำและเป็นธรรม</p>
                     <div style="display: flex; justify-content: center; margin-bottom: 10px; width: 100%;">
                         <div class="card" style="width: fit-content; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 12px 25px;">
-                            <h3 style="margin-bottom: 8px; font-size: 1.1rem; color: var(--accent-neon);">กราฟเปรียบเทียบ Linear กับ Cosine Learning Rate</h3>
+                            <h3 style="margin-bottom: 8px; font-size: 1.1rem; color: var(--accent-neon);">กราเปรียบเทียบ Linear กับ Cosine Learning Rate</h3>
                             <div style="width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.3); background: #030712; padding: 8px;">
                                 <svg viewBox="0 0 750 220" style="width: 680px; height: auto; max-height: 200px; display: block;">
                                     <line x1="60" y1="25" x2="720" y2="25" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4" />
@@ -904,6 +906,9 @@
     </div>
 </div>
 
+<!-- แก้ไข: ย้ายปุ่ม fullscreen ออกมาไว้นอกแท็ก <script> แล้ว -->
+<button id="fullscreenBtn" class="fullscreen-btn">⛶</button>
+
 <script>
     let currentSlide = 0;
     const totalSlides = 13;
@@ -966,8 +971,6 @@
         presentationContainer.style.transform = `scale(${scale})`;
     }
 
-    <button id="fullscreenBtn" class="fullscreen-btn">⛶</button>
-
     document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' || e.key === 'PageDown') {
             if (currentSlide < totalSlides - 1) changeSlide(1);
@@ -980,6 +983,8 @@
     window.addEventListener('resize', scaleToFit);
     scaleToFit();
     updatePosition();
+    
+    // ระบบทำงานของปุ่ม Fullscreen
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     fullscreenBtn.addEventListener('click', () => {
         if (!document.fullscreenElement) {
